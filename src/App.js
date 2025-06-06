@@ -90,7 +90,15 @@ function App() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
         />
-        <GeoJSON data={roi} style={{ color: 'red', weight: 2 }} />
+        <GeoJSON
+  data={roi}
+  style={{
+    color: 'black',           // cor da linha
+    weight: 2,              // espessura
+    fillOpacity: 0,         // sem preenchimento
+    dashArray: '4 4'        // linha tracejada (4px traço, 4px espaço)
+  }}
+/>
         {fireData.map((point, i) => (
           <Marker
             key={i}
