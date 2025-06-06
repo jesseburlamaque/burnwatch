@@ -1,4 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Corrigir ícones no React-Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
 
 function App() {
   const [fireData, setFireData] = useState([]);
@@ -12,20 +23,17 @@ function App() {
 
       try {
         const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
         const textData = await response.text();
-        const rows = textData.split('\n').map(row => row.split(','));
+        const rows = textData.split('\n').map(r => r.split(','));
         const headers = rows[0];
         const data = rows.slice(1).map(row => {
-          const rowData = {};
-          headers.forEach((header, index) => {
-            rowData[header] = row[index];
-          });
-          return rowData;
+          const obj = {};
+          headers.forEach((h, i) => (obj[h] = row[i]));
+          return obj;
         });
-        setFireData(data);
+        setFireData(data.filter(d => d.latitude && d.longitude)); // remove vazios
       } catch (error) {
         setError(error);
       } finally {
@@ -37,29 +45,26 @@ function App() {
   }, []);
 
   if (loading) return <div>Loading fire data...</div>;
-  if (error) return <div>Error loading fire data: {error.message}</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="App">
-      <h1>NASA FIRMS Fire Data</h1>
-      <table>
-        <thead>
-          <tr>
-            {fireData.length > 0 && Object.keys(fireData[0]).map(header => (
-              <th key={header}>{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {fireData.map((row, index) => (
-            <tr key={index}>
-              {Object.values(row).map((value, i) => (
-                <td key={i}>{value}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <h1>NASA FIRMS Fire Data (Map)</h1>
+      <MapContainer center={[0, 0]} zoom={2} style={{ height: '80vh', width: '100%' }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
+        />
+        {fireData.map((point, i) => (
+          <Marker key={i} position={[+point.latitude, +point.longitude]}>
+            <Popup>
+              <strong>{point.brightness}</strong><br />
+              Date: {point.acq_date}<br />
+              Satellite: {point.satellite}
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </div>
   );
 }
