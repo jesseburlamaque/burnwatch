@@ -7,9 +7,7 @@ function App() {
 
   useEffect(() => {
     const fetchFireData = async () => {
-      // NASA FIRMS MAP_KEY
-      const mapKey = '8c1c11a32d143574a95e6060f6636548'; //YOUR_MAP_KEY
-      // URL for MODIS data for the world for the last 1 day
+      const mapKey = '8c1c11a32d143574a95e6060f6636548';
       const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/MODIS_NRT/world/1`;
 
       try {
@@ -18,9 +16,7 @@ function App() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const textData = await response.text();
-        // Assuming the response is CSV, parse it
         const rows = textData.split('\n').map(row => row.split(','));
-        // Basic parsing, assumes header row and comma delimiter
         const headers = rows[0];
         const data = rows.slice(1).map(row => {
           const rowData = {};
@@ -40,13 +36,8 @@ function App() {
     fetchFireData();
   }, []);
 
-  if (loading) {
-    return <div>Loading fire data...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading fire data: {error.message}</div>;
-  }
+  if (loading) return <div>Loading fire data...</div>;
+  if (error) return <div>Error loading fire data: {error.message}</div>;
 
   return (
     <div className="App">
@@ -74,5 +65,3 @@ function App() {
 }
 
 export default App;
-
-
