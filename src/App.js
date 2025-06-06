@@ -5,12 +5,27 @@ import L from 'leaflet';
 import roi from './roi.json';
 import fireIcon from './fire.png';
 
+// Ícone customizado
 const FireIcon = new L.Icon({
   iconUrl: fireIcon,
   iconSize: [25, 25],
   iconAnchor: [12, 12],
   popupAnchor: [0, -10],
 });
+
+// Função para verificar se o ponto está dentro da ROI
+const isInsideROI = (lat, lon, geojson) => {
+  const point = L.latLng(lat, lon);
+  let isInside = false;
+
+  L.geoJSON(geojson).eachLayer(layer => {
+    if (layer.getBounds().contains(point)) {
+      isInside = true;
+    }
+  });
+
+  return isInside;
+};
 
 function App() {
   const [fireData, setFireData] = useState([]);
@@ -45,7 +60,14 @@ function App() {
             });
           })
         );
-        const merged = allData.flat().filter(d => d.latitude && d.longitude);
+
+        // Junta tudo e filtra os pontos dentro da ROI
+        const merged = allData.flat().filter(d => {
+          const lat = parseFloat(d.latitude);
+          const lon = parseFloat(d.longitude);
+          return lat && lon && isInsideROI(lat, lon, roi);
+        });
+
         setFireData(merged);
       } catch (err) {
         setError(err);
@@ -63,7 +85,7 @@ function App() {
   return (
     <div>
       <h2>FIRMS Fire Data Viewer</h2>
-      <MapContainer center={[0, 0]} zoom={2} style={{ height: '85vh', width: '100%' }}>
+      <MapContainer center={[0, 0]} zoom={3} style={{ height: '85vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
@@ -85,7 +107,7 @@ function App() {
         ))}
       </MapContainer>
 
-      {/* Legenda básica */}
+      {/* Legenda */}
       <div style={{ padding: '10px' }}>
         <h4>Legenda:</h4>
         <ul>
