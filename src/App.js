@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import roi from './roi.json';
+import fireIcon from './fire.png';
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+const FireIcon = new L.Icon({
+  iconUrl: fireIcon,
+  iconSize: [25, 25],
+  iconAnchor: [12, 12],
+  popupAnchor: [0, -10],
 });
 
 function App() {
@@ -16,22 +18,35 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchFireData = async () => {
+    const fetchAllSensors = async () => {
       const mapKey = '8c1c11a32d143574a95e6060f6636548';
-      const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/MODIS_NRT/world/1`;
+
+      const sensors = [
+        { name: 'MODIS_NRT', label: 'MODIS' },
+        { name: 'VIIRS_SNPP_NRT', label: 'VIIRS S-NPP' },
+        { name: 'VIIRS_NOAA20_NRT', label: 'VIIRS NOAA-20' },
+        { name: 'VIIRS_NOAA21_NRT', label: 'VIIRS NOAA-21' },
+      ];
 
       try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const textData = await response.text();
-        const rows = textData.split('\n').map(r => r.split(','));
-        const headers = rows[0];
-        const data = rows.slice(1).map(row => {
-          const obj = {};
-          headers.forEach((h, i) => obj[h] = row[i]);
-          return obj;
-        });
-        setFireData(data.filter(d => d.latitude && d.longitude));
+        const allData = await Promise.all(
+          sensors.map(async (sensor) => {
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/1`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Error from ${sensor.label}`);
+            const text = await response.text();
+            const rows = text.trim().split('\n').map(r => r.split(','));
+            const headers = rows[0];
+            return rows.slice(1).map(row => {
+              const obj = {};
+              headers.forEach((h, i) => obj[h] = row[i]);
+              obj.sensor = sensor.label;
+              return obj;
+            });
+          })
+        );
+        const merged = allData.flat().filter(d => d.latitude && d.longitude);
+        setFireData(merged);
       } catch (err) {
         setError(err);
       } finally {
@@ -39,7 +54,7 @@ function App() {
       }
     };
 
-    fetchFireData();
+    fetchAllSensors();
   }, []);
 
   if (loading) return <div>Loading fire data...</div>;
@@ -47,22 +62,39 @@ function App() {
 
   return (
     <div>
-      <h1>NASA FIRMS Fire Data Map</h1>
-      <MapContainer center={[0, 0]} zoom={2} style={{ height: '80vh', width: '100%' }}>
+      <h2>FIRMS Fire Data Viewer</h2>
+      <MapContainer center={[0, 0]} zoom={2} style={{ height: '85vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
         />
+        <GeoJSON data={roi} style={{ color: 'red', weight: 2 }} />
         {fireData.map((point, i) => (
-          <Marker key={i} position={[+point.latitude, +point.longitude]}>
+          <Marker
+            key={i}
+            position={[+point.latitude, +point.longitude]}
+            icon={FireIcon}
+          >
             <Popup>
-              <strong>{point.brightness}</strong><br />
+              <strong>{point.sensor}</strong><br />
+              Brightness: {point.brightness}<br />
               Date: {point.acq_date}<br />
               Satellite: {point.satellite}
             </Popup>
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Legenda básica */}
+      <div style={{ padding: '10px' }}>
+        <h4>Legenda:</h4>
+        <ul>
+          <li><img src={fireIcon} alt="icon" width={16} /> MODIS</li>
+          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS S-NPP</li>
+          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS NOAA-20</li>
+          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS NOAA-21</li>
+        </ul>
+      </div>
     </div>
   );
 }
