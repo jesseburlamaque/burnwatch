@@ -7,9 +7,9 @@ function App() {
 
   useEffect(() => {
     const fetchFireData = async () => {
-      // Replace 'YOUR_MAP_KEY' with your actual NASA FIRMS MAP_KEY
+      // NASA FIRMS MAP_KEY
       const mapKey = '8c1c11a32d143574a95e6060f6636548'; //YOUR_MAP_KEY
-      // Example URL for MODIS data for the world for the last 1 day
+      // URL for MODIS data for the world for the last 1 day
       const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/MODIS_NRT/world/1`;
 
       try {
