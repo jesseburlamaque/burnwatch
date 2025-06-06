@@ -3,12 +3,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Corrigir ícones no React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
 function App() {
@@ -24,18 +23,17 @@ function App() {
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
         const textData = await response.text();
         const rows = textData.split('\n').map(r => r.split(','));
         const headers = rows[0];
         const data = rows.slice(1).map(row => {
           const obj = {};
-          headers.forEach((h, i) => (obj[h] = row[i]));
+          headers.forEach((h, i) => obj[h] = row[i]);
           return obj;
         });
-        setFireData(data.filter(d => d.latitude && d.longitude)); // remove vazios
-      } catch (error) {
-        setError(error);
+        setFireData(data.filter(d => d.latitude && d.longitude));
+      } catch (err) {
+        setError(err);
       } finally {
         setLoading(false);
       }
@@ -49,7 +47,7 @@ function App() {
 
   return (
     <div>
-      <h1>NASA FIRMS Fire Data (Map)</h1>
+      <h1>NASA FIRMS Fire Data Map</h1>
       <MapContainer center={[0, 0]} zoom={2} style={{ height: '80vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
