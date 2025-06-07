@@ -2,6 +2,8 @@
 
 # 🔥 Burn Watch - FIRMS Fire Data Viewer
 
+https://burn-watch.netlify.app
+
 Este projeto é um **experimento interativo** feito com React e Leaflet para visualização dos focos de calor detectados pelos sensores **MODIS** e **VIIRS (S-NPP, NOAA-20, NOAA-21)**, usando dados da plataforma FIRMS (NASA) consumidos via API.
 
 O objetivo aqui foi **explorar a integração entre React, Leaflet e APIs públicas de monitoramento por satélite**.
