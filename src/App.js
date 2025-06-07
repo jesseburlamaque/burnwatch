@@ -3,15 +3,30 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import roi from './roi.json';
-import fireIcon from './fire.png';
+
+import modisIcon from './modis.png';
+import snppIcon from './viirs_snpp.png';
+import noaa20Icon from './viirs_noaa20.png';
+import noaa21Icon from './viirs_noaa21.png';
+
 import { useMap } from 'react-leaflet';
 
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point as turfPoint } from '@turf/helpers';
 
 // Ícone customizado
-const FireIcon = new L.Icon({
-  iconUrl: fireIcon,
+const sensorIcons = {
+  'MODIS': new L.Icon({ iconUrl: modisIcon, iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -10] }),
+  'VIIRS S-NPP': new L.Icon({ iconUrl: snppIcon, iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -10] }),
+  'VIIRS NOAA-20': new L.Icon({ iconUrl: noaa20Icon, iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -10] }),
+  'VIIRS NOAA-21': new L.Icon({ iconUrl: noaa21Icon, iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -10] }),
+};
+
+const fallbackIcon = new L.Icon.Default();
+
+// Ícone padrão
+const DefaultIcon = new L.Icon({
+  iconUrl: modisIcon, // ou qualquer um dos outros como fallback
   iconSize: [25, 25],
   iconAnchor: [12, 12],
   popupAnchor: [0, -10],
@@ -43,6 +58,8 @@ function App() {
   useEffect(() => {
     const fetchAllSensors = async () => {
       const mapKey = process.env.REACT_APP_FIRMS_KEY; 
+
+      
 
       const sensors = [
         { name: 'MODIS_NRT', label: 'MODIS' },
@@ -104,6 +121,7 @@ console.log("Points inside ROI after filtering:", merged.length);
     Detalhes: {error.message}<br />
     Verifique sua conexão ou a chave da API FIRMS.
   </div>
+
 );
 
   return (
@@ -128,7 +146,7 @@ console.log("Points inside ROI after filtering:", merged.length);
           <Marker
             key={i}
             position={[+point.latitude, +point.longitude]}
-            icon={FireIcon}
+            icon={sensorIcons[point.sensor] || fallbackIcon}
           >
             <Popup>
               <strong>{point.sensor}</strong><br />
@@ -144,10 +162,10 @@ console.log("Points inside ROI after filtering:", merged.length);
       <div style={{ padding: '10px' }}>
         <h4>Legenda:</h4>
         <ul>
-          <li><img src={fireIcon} alt="icon" width={16} /> MODIS</li>
-          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS S-NPP</li>
-          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS NOAA-20</li>
-          <li><img src={fireIcon} alt="icon" width={16} /> VIIRS NOAA-21</li>
+          <li><img src={modisIcon} alt="MODIS" width={16} /> MODIS</li>
+  <li><img src={snppIcon} alt="VIIRS S-NPP" width={16} /> VIIRS S-NPP</li>
+  <li><img src={noaa20Icon} alt="VIIRS NOAA-20" width={16} /> VIIRS NOAA-20</li>
+  <li><img src={noaa21Icon} alt="VIIRS NOAA-21" width={16} /> VIIRS NOAA-21</li>
         </ul>
       </div>
     </div>
