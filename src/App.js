@@ -5,6 +5,8 @@ import L from 'leaflet';
 import roi from './roi.json';
 import fireIcon from './fire.png';
 
+import { useMap } from 'react-leaflet';
+
 // Ícone customizado
 const FireIcon = new L.Icon({
   iconUrl: fireIcon,
@@ -27,6 +29,18 @@ const isInsideROI = (lat, lon, geojson) => {
   return isInside;
 };
 
+// function FitBoundsToROI({ geojson }) {
+function FitBoundsToROI({ geojson }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const bounds = L.geoJSON(geojson).getBounds();
+    map.fitBounds(bounds, { padding: [20, 20] });
+  }, [geojson, map]);
+
+  return null;
+}
+
 function App() {
   const [fireData, setFireData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +48,7 @@ function App() {
 
   useEffect(() => {
     const fetchAllSensors = async () => {
-      const mapKey = '8c1c11a32d143574a95e6060f6636548';
+      const mapKey = process.env.REACT_APP_FIRMS_KEY; //const mapKey = '8c1c11a32d143574a95e6060f6636548';
 
       const sensors = [
         { name: 'MODIS_NRT', label: 'MODIS' },
@@ -79,12 +93,18 @@ function App() {
     fetchAllSensors();
   }, []);
 
-  if (loading) return <div>Loading fire data...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <div>🔥 Loading fire data...</div>;
+  if (error) return (
+  <div style={{ padding: '1rem', color: 'red' }}>
+    🚨 Ocorreu um erro ao carregar os focos de calor.<br />
+    Detalhes: {error.message}<br />
+    Verifique sua conexão ou a chave da API FIRMS.
+  </div>
+);
 
   return (
     <div>
-      <h2>FIRMS Fire Data Viewer</h2>
+      <h2>  Burn Watch - FIRMS Fire Data Viewer</h2>
       <MapContainer center={[0, 0]} zoom={3} style={{ height: '85vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -98,7 +118,8 @@ function App() {
     fillOpacity: 0,         // sem preenchimento
     dashArray: '4 4'        // linha tracejada (4px traço, 4px espaço)
   }}
-/>
+/> <FitBoundsToROI geojson={roi} />
+
         {fireData.map((point, i) => (
           <Marker
             key={i}
