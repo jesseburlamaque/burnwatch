@@ -4,8 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import roi from './roi.json';
 import fireIcon from './fire.png';
-
 import { useMap } from 'react-leaflet';
+
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import { point as turfPoint } from '@turf/helpers';
 
 // Ícone customizado
 const FireIcon = new L.Icon({
@@ -17,16 +19,8 @@ const FireIcon = new L.Icon({
 
 // Função para verificar se o ponto está dentro da ROI
 const isInsideROI = (lat, lon, geojson) => {
-  const point = L.latLng(lat, lon);
-  let isInside = false;
-
-  L.geoJSON(geojson).eachLayer(layer => {
-    if (layer.getBounds().contains(point)) {
-      isInside = true;
-    }
-  });
-
-  return isInside;
+  const pt = turfPoint([lon, lat]);
+  return geojson.features.some(feature => booleanPointInPolygon(pt, feature));
 };
 
 // function FitBoundsToROI({ geojson }) {
@@ -48,7 +42,7 @@ function App() {
 
   useEffect(() => {
     const fetchAllSensors = async () => {
-      const mapKey = process.env.REACT_APP_FIRMS_KEY; //const mapKey = '8c1c11a32d143574a95e6060f6636548';
+      const mapKey = process.env.REACT_APP_FIRMS_KEY; 
 
       const sensors = [
         { name: 'MODIS_NRT', label: 'MODIS' },
@@ -60,17 +54,23 @@ function App() {
       try {
         const allData = await Promise.all(
           sensors.map(async (sensor) => {
-            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/1`;
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/2`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error from ${sensor.label}`);
             const text = await response.text();
             const rows = text.trim().split('\n').map(r => r.split(','));
             const headers = rows[0];
             return rows.slice(1).map(row => {
-              const obj = {};
-              headers.forEach((h, i) => obj[h] = row[i]);
-              obj.sensor = sensor.label;
-              return obj;
+  const obj = {};
+  headers.forEach((h, i) => obj[h] = row[i]);
+  obj.sensor = sensor.label;
+
+  // 👇 Aqui, dentro do sensor
+  if (!obj.sensor) {
+    console.warn(`[${sensor.label}] sensor not set:`, obj);
+  }
+
+  return obj;
             });
           })
         );
@@ -81,6 +81,10 @@ function App() {
           const lon = parseFloat(d.longitude);
           return lat && lon && isInsideROI(lat, lon, roi);
         });
+
+        // Logs de validação
+console.log("Total points fetched from all sensors:", allData.flat().length);
+console.log("Points inside ROI after filtering:", merged.length);
 
         setFireData(merged);
       } catch (err) {
