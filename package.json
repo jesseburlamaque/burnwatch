@@ -1,10 +1,13 @@
 {
-  "name": "burn-watch",
-  "version": "0.1.0",
+  "name": "burnwatch-final",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@turf/boolean-point-in-polygon": "^7.2.0",
+    "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
     "react-scripts": "5.0.1"
   },
   "scripts": {
