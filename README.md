@@ -1,55 +1,49 @@
 # burnwatch
 
 # 🔥 Burn Watch - FIRMS Fire Data Viewer
+> This project is **experimental** and was developed for exploratory purposes only.
 
-https://burn-watch.netlify.app
+https://burn-watch.netlify.app  
+This project is an **interactive experiment** built with React and Leaflet for visualizing fire hotspots detected by **MODIS** and **VIIRS (S-NPP, NOAA-20, NOAA-21)** sensors, using data from the FIRMS (NASA) platform accessed via `API`.
 
-Este projeto é um **experimento interativo** feito com React e Leaflet para visualização dos focos de calor detectados pelos sensores **MODIS** e **VIIRS (S-NPP, NOAA-20, NOAA-21)**, usando dados da plataforma FIRMS (NASA) consumidos via API.
-
-O objetivo aqui foi **explorar a integração entre React, Leaflet e APIs públicas de monitoramento por satélite**.
-
----
-
-## Funcionalidades
-
-- Exibe os focos de calor mais recentes (últimos dias)
-- Filtra os focos que estão **dentro de uma área geográfica específica (ROI)** definida por um arquivo GeoJSON
-- Ícones personalizados para cada tipo de sensor (MODIS, VIIRS)
-- Ajuste automático de zoom com base na área da ROI
-- Legenda explicativa com os sensores utilizados
+The goal was to **explore the integration between `React`, `Leaflet`, and public satellite monitoring `APIs`**.
 
 ---
 
-## Aviso
+## Features
 
-> Este projeto é **experimental** e foi desenvolvido apenas com fins exploratórios.  
+- Displays the most recent fire hotspots (last few days)
+- Filters hotspots **within a specific geographic area (ROI)** defined by a GeoJSON file
+- Custom icons for each sensor type (MODIS, VIIRS)
+- Automatic zoom adjustment based on the ROI area
+- Explanatory legend with the sensors used
 
 ---
 
-## Como rodar localmente
+## How to run locally
 
-### 1. Clonar o repositório
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/seu-usuario/burnwatch.git
+git clone https://github.com/jesseburlamaque/burnwatch
 cd burnwatch
 ```
 
-### 2. Instalar as dependências
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Adicionar chave da API FIRMS
+### 3. Add your FIRMS API key
 
-Crie um arquivo .env na raiz do projeto com o seguinte conteúdo. Você pode obter sua chave gratuita em: https://firms.modaps.eosdis.nasa.gov/api/
+Create a `.env` file at the root of the project with the following content. You can obtain your free API key at: https://firms.modaps.eosdis.nasa.gov/api/
 
 ```bash
-REACT_APP_FIRMS_KEY=sua_chave_firms_aqui
+REACT_APP_FIRMS_KEY=your_api_key_here
 ```
 
-### Rodar o projeto localmente
+### Run the project locally
 
 ```bash
 npm start
@@ -57,5 +51,5 @@ npm start
 
 ## Deploy (Netlify)
 
-Este app pode ser facilmente hospedado no Netlify.
-Certificando-se de adicionar a variável REACT_APP_FIRMS_KEY no painel Site Settings > Environment Variables.
+This app can be easily hosted on Netlify.  
+Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environment Variables panel.
