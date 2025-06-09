@@ -70,7 +70,7 @@ Create a `.env` file at the root of the project with the following content. You 
 REACT_APP_FIRMS_KEY=your_api_key_here
 ```
 
-### Run the project locally
+### 4. Run the project locally
 
 ```bash
 npm start
@@ -80,3 +80,6 @@ npm start
 
 This app can be easily hosted on Netlify.  
 Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environment Variables panel.
+
+#### Author
+Any questions, please use the email: burlamaque.jess@gmail.com
