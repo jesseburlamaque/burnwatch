@@ -3,7 +3,8 @@
 # 🔥 Burn Watch - FIRMS Fire Data Viewer
 > This project is **experimental** and was developed for exploratory purposes only.
 
-https://burn-watch.netlify.app  
+https://burn-watch.netlify.app
+
 This project is an **interactive experiment** built with React and Leaflet for visualizing fire hotspots detected by **MODIS** and **VIIRS (S-NPP, NOAA-20, NOAA-21)** sensors, using data from the FIRMS (NASA) platform accessed via `API`.
 
 The goal was to **explore the integration between `React`, `Leaflet`, and public satellite monitoring `APIs`**.
@@ -17,6 +18,32 @@ The goal was to **explore the integration between `React`, `Leaflet`, and public
 - Custom icons for each sensor type (MODIS, VIIRS)
 - Automatic zoom adjustment based on the ROI area
 - Explanatory legend with the sensors used
+
+---
+## Pipeline Architecture
+**API Request**
+Fetches CSV data from NASA FIRMS API for each sensor: MODIS, VIIRS S-NPP, VIIRS NOAA-20, and VIIRS NOAA-21.
+
+**CSV Parsing & Normalization**
+Parses rows, assigns sensor label, and converts coordinates to numeric format. Each line becomes a JavaScript object with hotspot metadata.
+
+**ROI Filtering**
+Uses Turf.js to check which points fall within the defined GeoJSON region of interest (ROI) - `@turf/boolean-point-in-polygon`
+
+**Mapping & Visualization**
+Displays filtered fire points on a Leaflet map, using a custom icon per sensor.
+- `<Marker>` component is rendered with `icon={sensorIcons[point.sensor]}`
+- A `<Popup>` shows additional data (brightness, date, satellite, etc.)
+- The `FitBoundsToROI` function centers the map based on the GeoJSON boundaries.
+
+**Deployment**
+Built with React and deployed via Netlify, using .env variables to protect the API key.
+
+**Possible Future Extensions**
+- Add filtering by date or intensity
+- Comparison between sensors
+- Temporal analysis (animation of hotspots)
+- Integration with historical FIRMS data
 
 ---
 
