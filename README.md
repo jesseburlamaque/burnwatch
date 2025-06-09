@@ -93,5 +93,5 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 Any questions, please use the email: burlamaque.jess@gmail.com
 
 #### Sources
-FIRMS archive data - https://firms.modaps.eosdis.nasa.gov/download/
-What is FIRMS - https://www.earthdata.nasa.gov/faq/firms-faq
+- FIRMS archive data - https://firms.modaps.eosdis.nasa.gov/download/
+- What is FIRMS - https://www.earthdata.nasa.gov/faq/firms-faq
