@@ -80,3 +80,6 @@ npm start
 
 This app can be easily hosted on Netlify.  
 Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environment Variables panel.
+
+## Author
+Any questions, please use the email: burlamaque.jess@gmail.com
