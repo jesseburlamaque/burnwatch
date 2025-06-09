@@ -1,5 +1,13 @@
 # burnwatch
 
+[![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
+[![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-brightgreen)](https://leafletjs.com/)
+[![Turf.js](https://img.shields.io/badge/Turf.js-geospatial-yellow)](https://turfjs.org/)
+[![Netlify](https://img.shields.io/badge/Deployed%20on-Netlify-orange)](https://www.netlify.com/)
+[![NASA FIRMS](https://img.shields.io/badge/Data%20Source-NASA%20FIRMS-red)](https://firms.modaps.eosdis.nasa.gov/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
+
+
 # 🔥 Burn Watch - FIRMS Fire Data Viewer
 > This project is **experimental** and was developed for exploratory purposes only.
 
@@ -83,3 +91,7 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 
 #### Author
 Any questions, please use the email: burlamaque.jess@gmail.com
+
+#### Sources
+FIRMS archive data - https://firms.modaps.eosdis.nasa.gov/download/
+What is FIRMS - https://www.earthdata.nasa.gov/faq/firms-faq
