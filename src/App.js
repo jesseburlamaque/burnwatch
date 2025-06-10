@@ -41,6 +41,40 @@ const isInsideROI = (lat, lon, geojson) => {
   return geojson.features.some(feature => booleanPointInPolygon(pt, feature));
 };
 
+// Função para filtrar por tempo
+const filterByTime = (data, filter) => {
+  if (filter === 'all') return data;
+  
+  const now = new Date();
+  const hoursMap = {
+    '24h': 24,
+    '48h': 48,
+    '72h': 72
+  };
+  
+  const hoursToSubtract = hoursMap[filter];
+  if (!hoursToSubtract) return data;
+  
+  const cutoffTime = new Date(now.getTime() - (hoursToSubtract * 60 * 60 * 1000));
+  
+  return data.filter(point => {
+    // Formato da data do FIRMS: YYYY-MM-DD
+    // Formato do tempo do FIRMS: HHMM
+    const dateStr = point.acq_date;
+    const timeStr = point.acq_time;
+    
+    if (!dateStr || !timeStr) return true;
+    
+    // Converte HHMM para HH:MM
+    const formattedTime = timeStr.length === 4 ? 
+      `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}` : 
+      timeStr;
+    
+    const pointDateTime = new Date(`${dateStr}T${formattedTime}:00Z`);
+    return pointDateTime >= cutoffTime;
+  });
+};
+
 // function FitBoundsToROI({ geojson }) {
 function FitBoundsToROI({ geojson }) {
   const map = useMap();
@@ -54,12 +88,13 @@ function FitBoundsToROI({ geojson }) {
 }
 
 // Componente para renderizar os marcadores de um sensor específico
-function SensorMarkers({ data, sensorName }) {
+function SensorMarkers({ data, sensorName, timeFilter }) {
   const sensorData = data.filter(point => point.sensor === sensorName);
+  const filteredData = filterByTime(sensorData, timeFilter);
   
   return (
     <LayerGroup>
-      {sensorData.map((point, i) => (
+      {filteredData.map((point, i) => (
         <Marker
           key={`${sensorName}-${i}`}
           position={[+point.latitude, +point.longitude]}
@@ -69,6 +104,7 @@ function SensorMarkers({ data, sensorName }) {
             <strong>{point.sensor}</strong><br />
             Brightness: {point.brightness}<br />
             Date: {point.acq_date}<br />
+            Time: {point.acq_time}<br />
             Satellite: {point.satellite}
           </Popup>
         </Marker>
@@ -81,6 +117,7 @@ function App() {
   const [fireData, setFireData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', '24h', '48h', '72h'
   const sensorTypes = ['MODIS', 'VIIRS S-NPP', 'VIIRS NOAA-20', 'VIIRS NOAA-21']; // Lista de sensores únicos para criar os layers
 
   useEffect(() => {
@@ -99,7 +136,7 @@ function App() {
       try {
         const allData = await Promise.all(
           sensors.map(async (sensor) => {
-            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/2`;
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/7`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error from ${sensor.label}`);
             const text = await response.text();
@@ -157,6 +194,70 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
   return (
     <div>
       <h2>  Burn Watch - FIRMS Fire Data Viewer</h2>
+      
+      {/* Controles de Filtro de Tempo */}
+      <div style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        padding: '15px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        margin: '10px 0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+        flexWrap: 'wrap'
+      }}>
+        <span style={{ fontWeight: 'bold', color: '#333' }}>🕒 Filtrar por tempo:</span>
+        
+        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <input
+            type="radio"
+            name="timeFilter"
+            value="all"
+            checked={timeFilter === 'all'}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            style={{ marginRight: '5px' }}
+          />
+          Todos os focos
+        </label>
+        
+        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <input
+            type="radio"
+            name="timeFilter"
+            value="24h"
+            checked={timeFilter === '24h'}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            style={{ marginRight: '5px' }}
+          />
+          Últimas 24h
+        </label>
+        
+        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <input
+            type="radio"
+            name="timeFilter"
+            value="48h"
+            checked={timeFilter === '48h'}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            style={{ marginRight: '5px' }}
+          />
+          Últimas 48h
+        </label>
+        
+        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <input
+            type="radio"
+            name="timeFilter"
+            value="72h"
+            checked={timeFilter === '72h'}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            style={{ marginRight: '5px' }}
+          />
+          Últimas 72h
+        </label>
+      </div>
+
       <MapContainer center={[0, 0]} zoom={3} style={{ height: '85vh', width: '100%' }}>
   <LayersControl position="topright">
   {/* Base Layers */}
@@ -184,7 +285,7 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
   {/* Sensor Overlay Layers */}
   {sensorTypes.map(sensorType => (
     <Overlay key={sensorType} checked name={`🔥 ${sensorType}`}>
-      <SensorMarkers data={fireData} sensorName={sensorType} />
+      <SensorMarkers data={fireData} sensorName={sensorType} timeFilter={timeFilter} />
     </Overlay>
   ))}
 
@@ -217,6 +318,20 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
   zIndex: 1000
 }}>
   <h4 style={{ marginTop: 0 }}>Legenda:</h4>
+  {/* Mostrar info do filtro ativo */}
+  {timeFilter !== 'all' && (
+    <div style={{ 
+      backgroundColor: '#e3f2fd', 
+      padding: '5px 8px', 
+      borderRadius: '4px', 
+      marginBottom: '8px',
+      fontSize: '11px',
+      color: '#1565c0'
+    }}>
+      🕒 Mostrando: {timeFilter === '24h' ? 'Últimas 24h' : 
+                    timeFilter === '48h' ? 'Últimas 48h' : 'Últimas 72h'}
+    </div>
+  )}
   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
     <li><img src={modisIcon} alt="MODIS" width={16} /> MODIS</li>
     <li><img src={snppIcon} alt="VIIRS S-NPP" width={16} /> VIIRS S-NPP</li>
