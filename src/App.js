@@ -143,9 +143,9 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
 
     <BaseLayer name="Stadia Satellite">
       <TileLayer
-        url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=${stadiaKey}"
-        attribution="&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; Satellite Imagery"
-      />
+      url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=${stadiaKey}`}
+      attribution="&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, Satellite Imagery"
+    />
     </BaseLayer>
 
   </LayersControl>
