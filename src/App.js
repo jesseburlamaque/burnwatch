@@ -14,6 +14,9 @@ import { useMap } from 'react-leaflet';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point as turfPoint } from '@turf/helpers';
 
+import { LayersControl } from 'react-leaflet';
+const { BaseLayer } = LayersControl;
+
 // Ícone customizado
 const sensorIcons = {
   'MODIS': new L.Icon({ iconUrl: modisIcon, iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -10] }),
@@ -128,10 +131,22 @@ console.log("Points inside ROI after filtering:", merged.length);
     <div>
       <h2>  Burn Watch - FIRMS Fire Data Viewer</h2>
       <MapContainer center={[0, 0]} zoom={3} style={{ height: '85vh', width: '100%' }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="© OpenStreetMap contributors"
-        />
+  <LayersControl position="topright">
+    <BaseLayer checked name="OpenStreetMap">
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="© OpenStreetMap contributors"
+      />
+    </BaseLayer>
+
+    <BaseLayer name="Stadia Satellite">
+      <TileLayer
+        url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg"
+        attribution="&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; Satellite Imagery"
+      />
+    </BaseLayer>
+
+  </LayersControl>
         <GeoJSON
   data={roi}
   style={{
