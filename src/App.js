@@ -183,15 +183,25 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
       </MapContainer>
 
       {/* Legenda */}
-      <div style={{ padding: '10px' }}>
-        <h4>Legenda:</h4>
-        <ul>
-          <li><img src={modisIcon} alt="MODIS" width={16} /> MODIS</li>
-  <li><img src={snppIcon} alt="VIIRS S-NPP" width={16} /> VIIRS S-NPP</li>
-  <li><img src={noaa20Icon} alt="VIIRS NOAA-20" width={16} /> VIIRS NOAA-20</li>
-  <li><img src={noaa21Icon} alt="VIIRS NOAA-21" width={16} /> VIIRS NOAA-21</li>
-        </ul>
-      </div>
+      <div style={{
+  position: 'absolute',
+  bottom: '120px',
+  right: '20px',
+  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  padding: '10px',
+  borderRadius: '8px',
+  boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+  zIndex: 1000
+}}>
+  <h4 style={{ marginTop: 0 }}>Legenda:</h4>
+  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+    <li><img src={modisIcon} alt="MODIS" width={16} /> MODIS</li>
+    <li><img src={snppIcon} alt="VIIRS S-NPP" width={16} /> VIIRS S-NPP</li>
+    <li><img src={noaa20Icon} alt="VIIRS NOAA-20" width={16} /> VIIRS NOAA-20</li>
+    <li><img src={noaa21Icon} alt="VIIRS NOAA-21" width={16} /> VIIRS NOAA-21</li>
+  </ul>
+</div>
+
     </div>
   );
 }
