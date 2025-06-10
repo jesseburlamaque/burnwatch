@@ -14,8 +14,8 @@ import { useMap } from 'react-leaflet';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point as turfPoint } from '@turf/helpers';
 
-import { LayersControl } from 'react-leaflet';
-const { BaseLayer } = LayersControl;
+import { LayersControl, LayerGroup } from 'react-leaflet';
+const { BaseLayer, Overlay } = LayersControl;
 
 // Ícone customizado
 const sensorIcons = {
@@ -53,10 +53,35 @@ function FitBoundsToROI({ geojson }) {
   return null;
 }
 
+// Componente para renderizar os marcadores de um sensor específico
+function SensorMarkers({ data, sensorName }) {
+  const sensorData = data.filter(point => point.sensor === sensorName);
+  
+  return (
+    <LayerGroup>
+      {sensorData.map((point, i) => (
+        <Marker
+          key={`${sensorName}-${i}`}
+          position={[+point.latitude, +point.longitude]}
+          icon={sensorIcons[point.sensor] || fallbackIcon}
+        >
+          <Popup>
+            <strong>{point.sensor}</strong><br />
+            Brightness: {point.brightness}<br />
+            Date: {point.acq_date}<br />
+            Satellite: {point.satellite}
+          </Popup>
+        </Marker>
+      ))}
+    </LayerGroup>
+  );
+}
+
 function App() {
   const [fireData, setFireData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const sensorTypes = ['MODIS', 'VIIRS S-NPP', 'VIIRS NOAA-20', 'VIIRS NOAA-21']; // Lista de sensores únicos para criar os layers
 
   useEffect(() => {
     const fetchAllSensors = async () => {
@@ -134,28 +159,40 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
       <h2>  Burn Watch - FIRMS Fire Data Viewer</h2>
       <MapContainer center={[0, 0]} zoom={3} style={{ height: '85vh', width: '100%' }}>
   <LayersControl position="topright">
-    <BaseLayer checked name="OpenStreetMap">
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="© OpenStreetMap contributors"
-      />
-    </BaseLayer>
-
-    <BaseLayer name="OpenTopoMap">
-      <TileLayer
-      url={`https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png}`}
+  {/* Base Layers */}
+  <BaseLayer checked name="OpenStreetMap">
+    <TileLayer
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       attribution="© OpenStreetMap contributors"
     />
-    </BaseLayer>
+  </BaseLayer>
 
-    <BaseLayer name="Stadia Satellite">
-      <TileLayer
+  <BaseLayer name="OpenTopoMap">
+    <TileLayer
+      url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+      attribution="© OpenStreetMap contributors"
+    />
+  </BaseLayer>
+
+  <BaseLayer name="Stadia Satellite">
+    <TileLayer
       url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}&api_key=${stadiaKey}`}
       attribution="&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; Satellite Imagery"
     />
-    </BaseLayer>
+  </BaseLayer>
 
-  </LayersControl>
+  {/* Sensor Overlay Layers */}
+  {sensorTypes.map(sensorType => (
+    <Overlay key={sensorType} checked name={`🔥 ${sensorType}`}>
+      <SensorMarkers data={fireData} sensorName={sensorType} />
+    </Overlay>
+  ))}
+
+  {/* ROI Overlay */}
+  <Overlay checked name="🗺️ Região de Interesse">
+    
+  </Overlay>
+</LayersControl>
         <GeoJSON
   data={roi}
   style={{
@@ -165,21 +202,7 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
     dashArray: '4 4'        // linha tracejada (4px traço, 4px espaço)
   }}
 /> <FitBoundsToROI geojson={roi} />
-
-        {fireData.map((point, i) => (
-          <Marker
-            key={i}
-            position={[+point.latitude, +point.longitude]}
-            icon={sensorIcons[point.sensor] || fallbackIcon}
-          >
-            <Popup>
-              <strong>{point.sensor}</strong><br />
-              Brightness: {point.brightness}<br />
-              Date: {point.acq_date}<br />
-              Satellite: {point.satellite}
-            </Popup>
-          </Marker>
-        ))}
+        
       </MapContainer>
 
       {/* Legenda */}
@@ -199,6 +222,10 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
     <li><img src={snppIcon} alt="VIIRS S-NPP" width={16} /> VIIRS S-NPP</li>
     <li><img src={noaa20Icon} alt="VIIRS NOAA-20" width={16} /> VIIRS NOAA-20</li>
     <li><img src={noaa21Icon} alt="VIIRS NOAA-21" width={16} /> VIIRS NOAA-21</li>
+    <p style={{ fontSize: '12px', margin: '10px 0 0 0', color: '#666' }}>
+  💡 Use o controle de layers no canto <br />
+  superior direito para mostrar/ocultar sensores
+</p>
   </ul>
 </div>
 
