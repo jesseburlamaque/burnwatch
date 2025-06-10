@@ -141,6 +141,13 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
       />
     </BaseLayer>
 
+    <BaseLayer name="OpenTopoMap">
+      <TileLayer
+      url={`https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png}`}
+      attribution="© OpenStreetMap contributors"
+    />
+    </BaseLayer>
+
     <BaseLayer name="Stadia Satellite">
       <TileLayer
       url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}&api_key=${stadiaKey}`}
