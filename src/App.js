@@ -218,7 +218,7 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
             onChange={(e) => setTimeFilter(e.target.value)}
             style={{ marginRight: '5px' }}
           />
-          Todos os focos
+          Todos os focos (7 dias)
         </label>
         
         <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
