@@ -5,7 +5,7 @@
 [![Turf.js](https://img.shields.io/badge/Turf.js-geospatial-yellow)](https://turfjs.org/)
 [![Netlify](https://img.shields.io/badge/Deployed%20on-Netlify-orange)](https://www.netlify.com/)
 [![NASA FIRMS](https://img.shields.io/badge/Data%20Source-NASA%20FIRMS-red)](https://firms.modaps.eosdis.nasa.gov/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
+[![Lifecycle:experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 
 # 🔥 Burn Watch - FIRMS Fire Data Viewer
