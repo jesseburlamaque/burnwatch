@@ -92,3 +92,39 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 #### Sources
 - FIRMS archive data - https://firms.modaps.eosdis.nasa.gov/download/
 - What is FIRMS - https://www.earthdata.nasa.gov/faq/firms-faq
+
+---
+
+## Status do Projeto
+
+| Status | Categoria | Item |
+|--------|-----------|------|
+| Feito | Funcionalidade | Mapa Leaflet com React |
+| Feito | Funcionalidade | Integracao API FIRMS (MODIS, VIIRS S-NPP, NOAA-20, NOAA-21) |
+| Feito | Funcionalidade | Parse de CSV e normalizacao dos dados |
+| Feito | Funcionalidade | Filtro por ROI via Turf.js |
+| Feito | Funcionalidade | Icones personalizados por tipo de sensor |
+| Feito | Funcionalidade | Filtro temporal (24h/48h/72h/todos) |
+| Feito | Funcionalidade | Camada base (OSM, OpenTopoMap, Stadia) |
+| Feito | Funcionalidade | Popup Clicável com metadados do foco |
+| Feito | Funcionalidade | Legenda dos sensores |
+| Feito | Funcionalidade | Deploy no Netlify |
+| Pendente | Correcao | URL do Stadia Satellite incorreta (`&api_key=` em vez de `?api_key=`) |
+| Pendente | Correcao | `filterByTime` trata horario como UTC — FIRMS usa hora local |
+| Pendente | Correcao | Console logs de debug esquecidos no codigo de producao |
+| Pendente | Correcao | Camada "Regiao de Interesse" vazia no LayersControl |
+| Pendente | Correcao | Falha de um sensor derruba todos os dados |
+| Pendente | Seguranca | Rotacionar chaves API (FIRMS e Stadia expostas no git) |
+| Feito | Seguranca | Impedir versionamento do `.env` |
+| Pendente | Teste | Testes unitarios: `isInsideROI`, `filterByTime`, parse CSV |
+| Pendente | Teste | Testes de integracao: fluxo fetch → parse → filtro → mapa |
+| Pendente | Teste | Smoke tests: App renderiza sem crash, loading e error states |
+| Pendente | Refatoracao | Componentizar App.js (351 linhas → arquivos separados) |
+| Pendente | Refatoracao | Adicionar Error Boundary |
+| Pendente | Refatoracao | Adicionar PropTypes ou TypeScript |
+| Pendente | Refatoracao | Acessibilidade (ARIA labels, navegacao por teclado) |
+| Pendente | Melhoria | Filtro por data ou intensidade (brightness) |
+| Pendente | Melhoria | Comparacao entre sensores |
+| Pendente | Melhoria | Animacao temporal dos focos |
+| Pendente | Melhoria | Dados historicos FIRMS |
+| Pendente | Melhoria | Responsividade (media queries)
