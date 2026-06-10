@@ -131,8 +131,27 @@ function App() {
   const sensorTypes = ['MODIS', 'VIIRS S-NPP', 'VIIRS NOAA-20', 'VIIRS NOAA-21']; // Lista de sensores únicos para criar os layers
 
   useEffect(() => {
+    const CACHE_KEY = 'burnwatch_cache';
+    const CACHE_TTL = 60 * 60 * 1000; // 1 hora em ms
+
     const fetchAllSensors = async () => {
       const mapKey = process.env.REACT_APP_FIRMS_KEY;
+
+      // Verificar cache no sessionStorage
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_TTL) {
+            setFireData(data);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          // Cache corrompido, ignora e busca na API
+          sessionStorage.removeItem(CACHE_KEY);
+        }
+      }
 
       const sensors = [
         { name: 'MODIS_NRT', label: 'MODIS' },
@@ -183,6 +202,9 @@ function App() {
 
         console.log(`[DEBUG] Total dados: ${allData.length}, Dentro ROI: ${merged.length}`);
         setFireData(merged);
+
+        // Salvar no cache
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: merged, timestamp: Date.now() }));
       } catch (err) {
         setError(err);
       } finally {
