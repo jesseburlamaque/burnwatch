@@ -102,7 +102,7 @@ function SensorMarkers({ data, sensorName, timeFilter }) {
         >
           <Popup>
             <strong>{point.sensor}</strong><br />
-            Brightness: {point.brightness}<br />
+            Brightness: {point.brightness || point.bright_ti4 || 'N/A'}<br />
             Date: {point.acq_date}<br />
             Time: {point.acq_time}<br />
             Satellite: {point.satellite}
@@ -122,9 +122,7 @@ function App() {
 
   useEffect(() => {
     const fetchAllSensors = async () => {
-      const mapKey = process.env.REACT_APP_FIRMS_KEY; 
-
-      
+      const mapKey = process.env.REACT_APP_FIRMS_KEY;
 
       const sensors = [
         { name: 'MODIS_NRT', label: 'MODIS' },
@@ -134,39 +132,42 @@ function App() {
       ];
 
       try {
-        const allData = await Promise.all(
+        const results = await Promise.allSettled(
           sensors.map(async (sensor) => {
-            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/7`;
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/1`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error from ${sensor.label}`);
+            if (!response.ok) throw new Error(`Error from ${sensor.label}: ${response.status}`);
             const text = await response.text();
             const rows = text.trim().split('\n').map(r => r.split(','));
             const headers = rows[0];
             return rows.slice(1).map(row => {
-  const obj = {};
-  headers.forEach((h, i) => obj[h] = row[i]);
-  obj.sensor = sensor.label;
-
-  // 👇 Aqui, dentro do sensor
-  if (!obj.sensor) {
-    console.warn(`[${sensor.label}] sensor not set:`, obj);
-  }
-
-  return obj;
+              const obj = {};
+              headers.forEach((h, i) => obj[h] = row[i]);
+              obj.sensor = sensor.label;
+              return obj;
             });
           })
         );
 
+        // Coletar apenas os resultados bem-sucedidos
+        const allData = results
+          .filter(r => r.status === 'fulfilled')
+          .map(r => r.value)
+          .flat();
+
+        // Log de falhas individualmente
+        results.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            console.warn(`Sensor ${sensors[i].label} falhou:`, result.reason.message);
+          }
+        });
+
         // Junta tudo e filtra os pontos dentro da ROI
-        const merged = allData.flat().filter(d => {
+        const merged = allData.filter(d => {
           const lat = parseFloat(d.latitude);
           const lon = parseFloat(d.longitude);
           return lat && lon && isInsideROI(lat, lon, roi);
         });
-
-        // Logs de validação
-console.log("Total points fetched from all sensors:", allData.flat().length);
-console.log("Points inside ROI after filtering:", merged.length);
 
         setFireData(merged);
       } catch (err) {
@@ -277,7 +278,7 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
 
   <BaseLayer name="Stadia Satellite">
     <TileLayer
-      url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}&api_key=${stadiaKey}`}
+      url={`https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.png?api_key=${stadiaKey}`}
       attribution="&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a>, &copy; Satellite Imagery"
     />
   </BaseLayer>
@@ -291,18 +292,18 @@ const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
 
   {/* ROI Overlay */}
   <Overlay checked name="🗺️ Região de Interesse">
-    
+    <GeoJSON
+      data={roi}
+      style={{
+        color: 'black',
+        weight: 2,
+        fillOpacity: 0,
+        dashArray: '4 4'
+      }}
+    />
   </Overlay>
 </LayersControl>
-        <GeoJSON
-  data={roi}
-  style={{
-    color: 'black',           // cor da linha
-    weight: 2,              // espessura
-    fillOpacity: 0,         // sem preenchimento
-    dashArray: '4 4'        // linha tracejada (4px traço, 4px espaço)
-  }}
-/> <FitBoundsToROI geojson={roi} />
+        <FitBoundsToROI geojson={roi} />
         
       </MapContainer>
 
