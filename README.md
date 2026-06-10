@@ -47,6 +47,25 @@ Displays filtered fire points on a Leaflet map, using a custom icon per sensor.
 **Deployment**
 Built with React and deployed via Netlify, using .env variables to protect the API key.
 
+---
+
+## Component Architecture
+
+The frontend uses a **flat file structure** (no `components/hooks/utils` subfolders) to keep the codebase lightweight and maintainable. Each file has a single responsibility.
+
+| File | Type | Responsibility | Inputs | Outputs |
+|------|------|----------------|--------|---------|
+| `App.js` | Container | Orchestrates the app. Holds `timeFilter` state and renders the map, controls, and legend. | `useFireData()` return | JSX layout |
+| `useFireData.js` | Custom Hook | Fetches FIRMS data for all 4 sensors in parallel, caches results in `sessionStorage`, parses CSV, and filters by ROI. | `REACT_APP_FIRMS_KEY` env var | `{ fireData, loading, error }` |
+| `geoUtils.js` | Pure Utils | Geospatial and time functions: `isInsideROI`, `getBBox`, `filterByTime`. | GeoJSON / raw data | Boolean / string / filtered array |
+| `mapConfig.js` | Config | Leaflet icon definitions and sensor constant arrays. | Static image imports | `sensorIcons`, `SENSOR_TYPES`, `FIRMS_SENSORS` |
+| `SensorMarkers.js` | Component | Renders `Marker` + `Popup` for a specific sensor, applying `timeFilter` via `filterByTime`. | `data`, `sensorName`, `timeFilter` | `<LayerGroup>` of markers |
+| `TimeFilter.js` | Component | Radio button group for selecting `all`, `24h`, `48h`, or `72h`. | `timeFilter`, `setTimeFilter` | Styled radio inputs |
+| `Legend.js` | Component | Floating legend showing active sensor icons and current filter status. | `timeFilter` | Positioned `<div>` with icons |
+| `FitBoundsToROI.js` | Component | Leaflet effect that auto-zooms the map to the ROI GeoJSON bounds. | `geojson` | `null` (side effect) |
+
+**How it works:** The `App` component calls `useFireData()` once on mount. The hook fetches data from NASA FIRMS in parallel, caches it, and returns `fireData`. The `App` then passes this array down to `SensorMarkers` (one instance per sensor), which filters it by `timeFilter` before rendering. `TimeFilter` and `Legend` are purely presentational and receive only the state they need. This separation makes unit testing (`geoUtils.js`) and future features (animations, intensity filters) straightforward.
+
 **Possible Future Extensions**
 - Add filtering by date or intensity
 - Comparison between sensors
@@ -139,7 +158,7 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 | 🟥 Pendente | Teste | Testes unitarios: `isInsideROI`, `filterByTime`, parse CSV |
 | 🟥 Pendente | Teste | Testes de integracao: fluxo fetch → parse → filtro → mapa |
 | 🟥 Pendente | Teste | Smoke tests: App renderiza sem crash, loading e error states |
-| 🟥 Pendente | Refatoracao | Componentizar App.js (351 linhas → arquivos separados) |
+| 🟩 Feito | Refatoracao | Componentizar App.js (387 linhas → 7 arquivos separados) |
 | 🟥 Pendente | Refatoracao | Adicionar Error Boundary |
 | 🟥 Pendente | Refatoracao | Adicionar PropTypes ou TypeScript |
 | 🟥 Pendente | Refatoracao | Acessibilidade (ARIA labels, navegacao por teclado) |
