@@ -55,6 +55,26 @@ Built with React and deployed via Netlify, using .env variables to protect the A
 
 ---
 
+### About NRT Data
+
+BurnWatch uses **NRT** (Near Real Time) data from NASA FIRMS. This choice was deliberate for the project's purpose: **testing a working integration between React and a public satellite API**.
+
+**NRT vs SP:**
+- **NRT** → available in **3-4 hours** after satellite overpass. Minimal processing: automated detection, quick geolocation, no human validation. This is the "draft" of the data.
+- **SP** (Standard Processing) → available in **days/weeks**. Goes through orbital refinement, false positive elimination, and scientific validation. This is the "final product".
+
+**Why NRT is less accurate:**
+- No orbital refinement: position may vary by ~hundreds of meters
+- More false positives: sun glint on metal surfaces, hot sand
+- Algorithm uses approximate thresholds (adjusted in SP with ground data)
+
+**Why we chose NRT:**
+BurnWatch is an architecture experiment — not a scientific analysis or emergency response tool. NRT delivers **speed, REST API accessibility, and manageable volume** for a frontend. It is the right fuel for validating that React ↔ Leaflet ↔ FIRMS API work together.
+
+**In practice:** the user sees fire hotspots detected within the last 48 hours, with a few hours of delay. Some points may be artifacts. For scientific use, use [SP](https://forum.earthdata.nasa.gov/viewtopic.php?t=5195). For rapid prototyping, NRT is the right choice.
+
+---
+
 ## How to run locally
 
 ### 1. Clone the repository
