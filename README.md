@@ -71,7 +71,7 @@ BurnWatch uses **NRT** (Near Real Time) data from NASA FIRMS. This choice was de
 **Why we chose NRT:**
 BurnWatch is an architecture experiment — not a scientific analysis or emergency response tool. NRT delivers **speed, REST API accessibility, and manageable volume** for a frontend. It is the right fuel for validating that React ↔ Leaflet ↔ FIRMS API work together.
 
-**In practice:** the user sees fire hotspots detected within the last 48 hours, with a few hours of delay. Some points may be artifacts. For scientific use, use [SP](https://forum.earthdata.nasa.gov/viewtopic.php?t=5195). For rapid prototyping, NRT is the right choice.
+**In practice:** the user sees fire hotspots detected within the last 48 hours, with a few hours of delay. Some points may be artifacts. For scientific use, use SP. For rapid prototyping, [NRT] (https://www.earthdata.nasa.gov/data/tools/firms/faq) is the right choice.
 
 ---
 
