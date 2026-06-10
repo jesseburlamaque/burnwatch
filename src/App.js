@@ -134,7 +134,7 @@ function App() {
       try {
         const results = await Promise.allSettled(
           sensors.map(async (sensor) => {
-            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/1`;
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/2`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error from ${sensor.label}: ${response.status}`);
             const text = await response.text();
@@ -169,6 +169,7 @@ function App() {
           return lat && lon && isInsideROI(lat, lon, roi);
         });
 
+        console.log(`[DEBUG] Total dados: ${allData.length}, Dentro ROI: ${merged.length}`);
         setFireData(merged);
       } catch (err) {
         setError(err);
