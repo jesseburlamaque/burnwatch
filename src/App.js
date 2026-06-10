@@ -41,6 +41,16 @@ const isInsideROI = (lat, lon, geojson) => {
   return geojson.features.some(feature => booleanPointInPolygon(pt, feature));
 };
 
+// Função para obter o bounding box do GeoJSON no formato FIRMS: west,south,east,north
+const getBBox = (geojson) => {
+  const bounds = L.geoJSON(geojson).getBounds();
+  const west = bounds.getWest().toFixed(4);
+  const south = bounds.getSouth().toFixed(4);
+  const east = bounds.getEast().toFixed(4);
+  const north = bounds.getNorth().toFixed(4);
+  return `${west},${south},${east},${north}`;
+};
+
 // Função para filtrar por tempo
 const filterByTime = (data, filter) => {
   if (filter === 'all') return data;
@@ -131,10 +141,12 @@ function App() {
         { name: 'VIIRS_NOAA21_NRT', label: 'VIIRS NOAA-21' },
       ];
 
+      const bbox = getBBox(roi);
+
       try {
         const results = await Promise.allSettled(
           sensors.map(async (sensor) => {
-            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/world/2`;
+            const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey}/${sensor.name}/${bbox}/2`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error from ${sensor.label}: ${response.status}`);
             const text = await response.text();

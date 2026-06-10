@@ -128,5 +128,5 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 | Pendente | Melhoria | Animacao temporal dos focos |
 | Pendente | Melhoria | Dados historicos FIRMS |
 | Pendente | Melhoria | Cache local para evitar requisicoes repetidas a API FIRMS |
-| Pendente | Melhoria | Buscar apenas coordenadas da ROI ao inves de 'world' inteiro na API FIRMS |
+| Feito | Melhoria | Buscar apenas coordenadas da ROI ao inves de 'world' inteiro na API FIRMS |
 | Pendente | Melhoria | Responsividade (media queries) |
