@@ -70,7 +70,7 @@ const filterByTime = (data, filter) => {
       `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}` : 
       timeStr;
     
-    const pointDateTime = new Date(`${dateStr}T${formattedTime}:00Z`);
+    const pointDateTime = new Date(`${dateStr}T${formattedTime}:00`);
     return pointDateTime >= cutoffTime;
   });
 };

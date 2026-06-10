@@ -110,7 +110,7 @@ Make sure to add the REACT_APP_FIRMS_KEY variable in the Site Settings > Environ
 | Feito | Funcionalidade | Legenda dos sensores |
 | Feito | Funcionalidade | Deploy no Netlify |
 | Feito | Correcao | URL do Stadia Satellite incorreta (`&api_key=` em vez de `?api_key=`) |
-| Pendente | Correcao | `filterByTime` trata horario como UTC — FIRMS usa hora local |
+| Feito | Correcao | `filterByTime` trata horario como UTC — FIRMS usa hora local |
 | Feito | Correcao | Console logs de debug esquecidos no codigo de producao |
 | Feito | Correcao | Camada "Regiao de Interesse" vazia no LayersControl |
 | Feito | Correcao | Falha de um sensor derruba todos os dados |
