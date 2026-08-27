@@ -19,7 +19,6 @@ export function getBBox(geojson) {
 export function filterByTime(data, filter) {
   if (filter === 'all') return data;
 
-  const now = new Date();
   const hoursMap = {
     '24h': 24,
     '48h': 48,
@@ -29,19 +28,22 @@ export function filterByTime(data, filter) {
   const hoursToSubtract = hoursMap[filter];
   if (!hoursToSubtract) return data;
 
+  const now = new Date();
   const cutoffTime = new Date(now.getTime() - (hoursToSubtract * 60 * 60 * 1000));
 
   return data.filter(point => {
-    const dateStr = point.acq_date;
-    const timeStr = point.acq_time;
-
-    if (!dateStr || !timeStr) return true;
-
-    const formattedTime = timeStr.length === 4
-      ? `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`
-      : timeStr;
-
-    const pointDateTime = new Date(`${dateStr}T${formattedTime}:00`);
+    const pointDateTime = parseAcqDateTime(point.acq_date, point.acq_time);
+    if (!pointDateTime) return true;
     return pointDateTime >= cutoffTime;
   });
+}
+
+function parseAcqDateTime(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+
+  const time = String(timeStr).padStart(4, '0');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr) || !/^\d{4}$/.test(time)) return null;
+
+  const parsed = new Date(`${dateStr}T${time.slice(0, 2)}:${time.slice(2, 4)}:00Z`);
+  return isNaN(parsed.getTime()) ? null : parsed;
 }
