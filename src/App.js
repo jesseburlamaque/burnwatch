@@ -14,7 +14,7 @@ import Legend from './Legend';
 
 function App() {
   const [timeFilter, setTimeFilter] = useState('all');
-  const { fireData, loading, error } = useFireData();
+  const { fireData, loading, error, sensorErrors } = useFireData();
   const stadiaKey = process.env.REACT_APP_STADIA_API_KEY;
 
   if (loading) return <div>🔥 Loading fire data...</div>;
@@ -29,6 +29,18 @@ function App() {
   return (
     <div>
       <h2>Burn Watch - FIRMS Fire Data Viewer</h2>
+
+      {sensorErrors.length > 0 && (
+        <div style={{
+          backgroundColor: '#fff3cd',
+          color: '#856404',
+          padding: '10px 15px',
+          borderRadius: '8px',
+          margin: '10px 0'
+        }}>
+          ⚠️ Dados parciais: sem dados de {sensorErrors.join(', ')}.
+        </div>
+      )}
 
       <TimeFilter timeFilter={timeFilter} setTimeFilter={setTimeFilter} />
 
