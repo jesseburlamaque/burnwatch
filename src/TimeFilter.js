@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function TimeFilter({ timeFilter, setTimeFilter }) {
   const options = [
-    { value: 'all', label: 'Todos os focos (7 dias)' },
+    { value: 'all', label: 'Todos os focos (5 dias)' },
     { value: '24h', label: 'Últimas 24h' },
     { value: '48h', label: 'Últimas 48h' },
     { value: '72h', label: 'Últimas 72h' },

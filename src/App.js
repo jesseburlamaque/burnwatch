@@ -6,11 +6,10 @@ const { BaseLayer, Overlay } = LayersControl;
 import roi from './roi.json';
 
 import { useFireData } from './useFireData';
-import { SENSOR_TYPES } from './mapConfig';
+import { SENSOR_TYPES, sensorIconUrls } from './mapConfig';
 import FitBoundsToROI from './FitBoundsToROI';
 import SensorMarkers from './SensorMarkers';
 import TimeFilter from './TimeFilter';
-import Legend from './Legend';
 
 function App() {
   const [timeFilter, setTimeFilter] = useState('all');
@@ -68,7 +67,11 @@ function App() {
           </BaseLayer>
 
           {SENSOR_TYPES.map(sensorType => (
-            <Overlay key={sensorType} checked name={`🔥 ${sensorType}`}>
+            <Overlay
+              key={sensorType}
+              checked
+              name={`<img src="${sensorIconUrls[sensorType]}" width="20" height="20" style="vertical-align:middle;margin-right:6px;border-radius:3px;"> ${sensorType}`}
+            >
               <SensorMarkers data={fireData} sensorName={sensorType} timeFilter={timeFilter} />
             </Overlay>
           ))}
@@ -88,8 +91,6 @@ function App() {
 
         <FitBoundsToROI geojson={roi} />
       </MapContainer>
-
-      <Legend timeFilter={timeFilter} />
     </div>
   );
 }

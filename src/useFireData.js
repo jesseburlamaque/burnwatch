@@ -5,7 +5,7 @@ import { FIRMS_SENSORS } from './mapConfig';
 
 const CACHE_KEY = 'burnwatch_cache_v2';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora em ms
-const DAY_RANGE = 7;
+const DAY_RANGE = 5; // FIRMS NRT aceita no máximo 5 dias
 
 function readCache() {
   try {
